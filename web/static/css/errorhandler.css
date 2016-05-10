@@ -1,0 +1,12 @@
+.main {
+    font-family: "Microsoft YaHei", Hiragino Sans GB, KaiTi, serif;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: dodgerblue;
+}

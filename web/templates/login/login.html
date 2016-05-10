@@ -1,0 +1,20 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+
+
+{% block title %}
+Token设置
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 5em">
+    <div style="text-align: center;"><h1>Weibo Spyder</h1></div>
+    <p> 请点击 <a href = {{ authorize_url }} >这里 </a> 进行登录</p>
+    {{ util.flashed_messages(dismissible=True) }}
+    {{ wtf.quick_form(form, form_type='horizontal',button_map={'submit_button': 'primary'}) }}
+</div>
+
+{% endblock %}
+

@@ -1,0 +1,28 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+
+{% block content %}
+<h1>登录成功!</h1>
+
+<table class="table">
+
+    <thead>
+    <tr>
+        <th>字段</th>
+        <th>内容</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for one in data %}
+    <tr>
+        <td><span>{{ one[0] }}</span></td>
+        <td><span>{{ one[1] }}</span></td>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+
+{% endblock %}
