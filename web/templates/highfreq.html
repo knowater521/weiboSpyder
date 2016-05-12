@@ -1,0 +1,28 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+
+{% block content %}
+<h1>高频词列表</h1>
+
+<table class="table">
+
+    <thead>
+    <tr>
+        <th>词汇</th>
+        <th>频次</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for a,b in dict %}
+    <tr>
+        <td><span>{{ a }}</span></td>
+        <td><span>{{ b }}</span></td>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+
+{% endblock %}

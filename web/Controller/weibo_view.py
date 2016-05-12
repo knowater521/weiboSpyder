@@ -5,6 +5,8 @@ from flask_wtf import Form
 from wtforms import SubmitField,StringField,validators
 from functools import wraps
 baseurl = ''
+import re
+import jieba
 
 
 class TokenForm(Form):
@@ -59,13 +61,45 @@ def get_person_info():
 @app.route(baseurl + '/friendsbilateral')
 @login_with_known_token
 def get_friends_bilateral():
-    x = weibo.get('friendships/friends/bilateral',uid =3173405774)
-    for one in x["users"]:
-        try:
-            print("{} {} {} {}".format(one['screen_name'],one['description'],one['status']['text'][:5],one['friends_count'] ) )
-        except:
-            pass
+    x = weibo.get('comments/timeline',uid =3173405774)
+    # for one in x["users"]:
+    #     try:
+    #         print("{} {} {} {}".format(one['screen_name'],one['description'],one['status']['text'][:5],one['friends_count'] ) )
+    #     except:
+    #         pass
     return str(x)
 
 
+@app.route(baseurl + '/weibo/<name>')
+@login_with_known_token
+def get_weibo_by_name(name):
+    STOPWORDS=[u'的',u'地',u'得',u'而',u'了',u'在',u'是',u'我',u'有',u'和',u'就',u'不',u'人',u'都',u'一',u'一个',u'上',u'也',u'很',u'到',
+               u'说',u'要',u'去',u'你',u'会',u'着',u'没有',u'看',u'好',u'自己',u'这'," "]
+
+    r = re.compile(r'[\u4e00-\u9fa5]+')
+
+    x = weibo.get('statuses/user_timeline', screen_name=name,count=100)
+    lists = x["statuses"]
+    dict = {}
+    for one in lists:
+        content = one['text']
+        clear_content = re.sub(r"\[(.+?)\]", "", content)
+        clear_content = re.sub(r" @(.+?) |(HTTP|http)s?://[^,， ]+", "", clear_content)
+        clear_content = " ".join(r.findall(clear_content))
+        seg_list = jieba.cut(clear_content)
+        segs = list(seg_list)
+        print('内容:{}\n关键词:{}\n\n'.format(clear_content," ".join(segs)))
+
+        for seg in segs:
+            if seg not in STOPWORDS:
+                if seg in dict:
+                    dict[seg] += 1
+                else:
+                    dict[seg] = 1
+
+    dict_sorted = sorted(dict.items(), key=lambda d: d[1], reverse=True)
+    for a,b in dict_sorted:
+        if b > 0:
+            print(a + ',' + str(b) + '\n')
+    return render_template('highfreq.html',dict = dict_sorted)
 
