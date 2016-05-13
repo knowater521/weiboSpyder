@@ -11,7 +11,11 @@ Token设置
 {% block content %}
 <div class="container" style="margin-top: 5em">
     <div style="text-align: center;"><h1>Weibo Spyder</h1></div>
-    <p> 请点击 <a href = {{ authorize_url }} >这里 </a> 进行登录</p>
+    <p> 请点击 <a target="_blank" href = {{ authorize_url }} >这里 </a> 进行登录</p>
+    <p> 登录后浏览器会调到一个奇怪的网址 例如 http://oauth.weico.cc/?code=xxxxxxxxxxxx </p>
+    <p> 请将code=后的token复制到这里提交</p>
+    <p> 为了使用新浪高级api,用的是weico客户端api,来打我啊~~~</p>
+    <p></p>
     {{ util.flashed_messages(dismissible=True) }}
     {{ wtf.quick_form(form, form_type='horizontal',button_map={'submit_button': 'primary'}) }}
 </div>

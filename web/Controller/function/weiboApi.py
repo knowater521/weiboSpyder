@@ -15,12 +15,23 @@ import json
 import time
 import requests
 
+# My app key
+# APP_KEY='2234918214'
+# APP_SECRET='8e7c9832fd113ad36bed58ff8892a098'
+# CALLBACK_URL='https://api.weibo.com/oauth2/default.html'
+
+# Weico App Key
+# APP_KEY = '211160679'
+# APP_SECRET = '63b64d531b98c2dbff2443816f274dd3'
+# CALLBACK_URL = 'http://oauth.weico.cc'
+# AUTH_URL = 'https://api.weibo.com/oauth2/authorize'
+
 
 class Client(object):
 
     token = None
 
-    def __init__(self, api_key, api_secret, redirect_uri, token=None,
+    def __init__(self, token=None,
                  username=None, password=None):
         # const define
         self.site = 'https://api.weibo.com/'
@@ -29,9 +40,9 @@ class Client(object):
         self.api_url = self.site + '2/'
 
         # init basic info
-        self.client_id = api_key
-        self.client_secret = api_secret
-        self.redirect_uri = redirect_uri
+        self.client_id = '211160679'
+        self.client_secret = '63b64d531b98c2dbff2443816f274dd3'
+        self.redirect_uri = 'http://oauth.weico.cc'
 
         self.session = requests.session()
         if username and password:

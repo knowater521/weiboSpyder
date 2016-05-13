@@ -24,10 +24,11 @@ mysql_url = 'mysql+mysqlconnector://{0}:{1}@localhost:{2}/'.format(Environment.m
                                                                    Environment.mysql_port)
 app.config['SQLALCHEMY_BINDS'] = {"project": mysql_url + 'weibo'}
 
-# @app.before_request
-# def make_session_permanent():
-#     session.permanent = True
-#     app.permanent_session_lifetime = timedelta(days=31)
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(days=31)
 
 
 import web.Controller
