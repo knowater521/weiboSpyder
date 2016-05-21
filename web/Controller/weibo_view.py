@@ -4,8 +4,11 @@ from flask_wtf import Form
 from wtforms import SubmitField, StringField, validators
 from functools import wraps
 from web.Controller.function.weiboApi import Client
+from ..Model.database import Public,db,My
+
 import re
 import jieba
+import datetime
 
 baseurl = ''
 
@@ -22,10 +25,10 @@ def login_with_known_token(func):
         if not token:
             return redirect('/login')
         weibo = Client(token=token)
-        try:
-            return func(weibo=weibo, *args, **kw)
-        except RuntimeError:
-            return redirect(url_for('login_weibo'))
+        # try:
+        return func(weibo=weibo, *args, **kw)
+        # except RuntimeError:
+        #     return redirect(url_for('login_weibo'))
 
     return wrapper
 
@@ -63,16 +66,35 @@ def get_person_info(weibo):
     return render_template('login/login_success.html', data=[['uid', uid['uid']]])
 
 
-@app.route(baseurl + '/friendsbilateral')
+@app.route(baseurl + '/publictimeline')
 @login_with_known_token
-def get_friends_bilateral(weibo):
-    x = weibo.get('comments/timeline', uid=3173405774)
-    # for one in x["users"]:
-    #     try:
-    #         print("{} {} {} {}".format(one['screen_name'],one['description'],one['status']['text'][:5],one['friends_count'] ) )
-    #     except:
-    #         pass
+def get_public_weibo(weibo):
+    x = weibo.get('statuses/public_timeline', count=50)
+    for one in x["statuses"]:
+        time = datetime.datetime.strptime(one["created_at"], '%a %b %d %H:%M:%S %z %Y')
+        uid = one["id"]
+        text = one["text"]
+        db.session.add(Public(uid, text, time))
+
+    db.session.commit()
+
     return str(x)
+
+
+@app.route(baseurl + '/mytimeline')
+@login_with_known_token
+def get_my_weibo(weibo):
+    for page in range(6,10):
+        x = weibo.get('statuses/home_timeline', count=100, trim_user=1,page=page)
+        for one in x["statuses"]:
+            time = datetime.datetime.strptime(one["created_at"], '%a %b %d %H:%M:%S %z %Y')
+            uid = one["id"]
+            text = one["text"]
+            db.session.add(My(uid, text, time))
+
+    db.session.commit()
+
+    return 'done'
 
 
 @app.route(baseurl + '/weibo/<name>')
@@ -105,3 +127,5 @@ def get_weibo_by_name(weibo, name):
     dict_sorted = sorted(dicts.items(), key=lambda d: d[1], reverse=True)
 
     return render_template('highfreq.html', dict=dict_sorted)
+
+

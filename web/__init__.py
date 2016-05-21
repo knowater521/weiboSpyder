@@ -22,7 +22,7 @@ app.config['SQLALCHEMY_NATIVE_UNICODE'] = True
 # app.config['SQLALCHEMY_ECHO']=True
 mysql_url = 'mysql+mysqlconnector://{0}:{1}@localhost:{2}/'.format(Environment.mysql_user, Environment.mysql_passwd,
                                                                    Environment.mysql_port)
-app.config['SQLALCHEMY_BINDS'] = {"project": mysql_url + 'weibo'}
+app.config['SQLALCHEMY_BINDS'] = {"weibo": mysql_url + 'weibo'}
 
 
 @app.before_request
