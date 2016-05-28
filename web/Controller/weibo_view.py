@@ -84,7 +84,7 @@ def get_public_weibo(weibo):
 @app.route(baseurl + '/mytimeline')
 @login_with_known_token
 def get_my_weibo(weibo):
-    for page in range(6,10):
+    for page in range(1,10):
         x = weibo.get('statuses/home_timeline', count=100, trim_user=1,page=page)
         for one in x["statuses"]:
             time = datetime.datetime.strptime(one["created_at"], '%a %b %d %H:%M:%S %z %Y')

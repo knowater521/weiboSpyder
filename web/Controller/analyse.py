@@ -2,10 +2,12 @@ from web.Model.database import My,Public
 import numpy as np
 import os
 import jieba
+import datetime
 
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 import re
+
 
 def anayse():
     datas = Public.query.limit(400).all()
@@ -13,7 +15,7 @@ def anayse():
     for one in datas:
         arraylist.append(fenci(one.text))
 
-    Tfidf(arraylist)
+    Tfidf(arraylist,datas)
 
 r = re.compile(r'[\u4e00-\u9fa5]+')
 
@@ -35,7 +37,7 @@ def fenci(text):
     return " ".join(result)
 
 
-def Tfidf(arraylist):
+def Tfidf(arraylist,datas):
     corpus = []
     for ff in arraylist:
         corpus.append(ff)
@@ -51,12 +53,11 @@ def Tfidf(arraylist):
     if not os.path.exists(sFilePath):
         os.mkdir(sFilePath)
 
-    proweight = np.argsort(weight, axis=1)[::-1]
     # print(proweight)
     # print(weight)
     # print('----------')
     # print(weight[0].sort())
-    anasy2(weight,word)
+    anasy2(weight,word,datas)
     # for i in range(len(weight)):
     #     f = open(sFilePath + '/' + str(i).zfill(5) + '.txt', 'w+')
     #     res = []
@@ -73,30 +74,32 @@ def get_cos_vaule(x,y):
     Ly = np.sqrt(y.dot(y))
     return x.dot(y) / (Lx * Ly)
 
-def anasy2(datas,words):
+
+def get_time_similarity(x,y):
+    return (1 - abs(x-y).seconds/86400) > 0
+
+
+def anasy2(vectors, words, datas):
     cou = 0
-    topics = [datas[0]]
-    for i in range(1,len(datas)):
+    topics = [{'vector':vectors[0],'wids':[datas[0].wid]}]
+    for i in range(1, len(vectors)):
         match = False
         for j in range(len(topics)):
             cou+=1
-            res = get_cos_vaule(datas[i], topics[j])
+            res = get_cos_vaule(vectors[i], topics[j]['vector'])
             if res > 0.5:
                 match = True
 
-
-                for k in range(0,len(datas[j])):
-                    if datas[j][k] > 0:
-                        print(words[k])
-
-                print('---')
-
-                topics[j] = (topics[j] + datas[i])/2
+                topics[j]['vector'] = (topics[j]['vector'] + vectors[i]) / 2
+                topics[j]['wids'].append(datas[i].wid)
         if not match:
-            topics.append(datas[i])
-    # print(topics)
+            topics.append({'vector': vectors[i],'wids':[datas[i].wid]})
     print(cou)
     print(len(topics))
 
+    for one in topics:
+        if len(one['wids'])>1:
+            print(one['wids'])
 
-anayse()
+if __name__ == '__main__':
+    anayse()
