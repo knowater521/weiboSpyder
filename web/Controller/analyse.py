@@ -52,11 +52,28 @@ def Tfidf(arraylist,datas):
     # if not os.path.exists(sFilePath):
     #     os.mkdir(sFilePath)
 
+
+    column_sum_sort = weight[0].copy()
+    for i in range(1,len(weight)):
+        column_sum_sort += weight[i]
+    column_sum_sort = np.argsort(column_sum_sort)[::-1]
+
+    weight_tran = weight.transpose()
+    weight_sort = weight_tran[column_sum_sort[0]]
+
+    lens = int(len(weight_tran))
+
+    for i in range(1,20):
+        weight_sort = np.row_stack((weight_sort,weight_tran[column_sum_sort[i]]))
+    weight_sort = weight_sort.transpose()
+
+
+
     # print(proweight)
     # print(weight)
     # print('----------')
     # print(weight[0].sort())
-    anasy2(weight,word,datas)
+    anasy2(weight_sort,word,datas)
     # for i in range(len(weight)):
     #     f = open(sFilePath + '/' + str(i).zfill(5) + '.txt', 'w+')
     #     res = []
