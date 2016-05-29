@@ -1,16 +1,14 @@
-x = """
-{
-    "statuses": [
-        {
-            "created_at": "Tue May 31 17:46:55 +0800 2011"
-            }]
-
-}
-
-"""
-import json
+import xlrd
 import datetime
-y = json.loads(x)
-print(y["statuses"][0]['created_at'])
-z = datetime.datetime.strptime('Tue May 31 17:46:55 +0900 2011', '%a %b %d %H:%M:%S %z %Y')
-print(z.minute)
+from web.Model.database import Lab,db
+data = xlrd.open_workbook('/Volumes/RamDisk/FinalData.xls')
+table = data.sheets()[0]
+nrows = table.nrows
+for i in range(1, nrows):
+    uid = table.cell(i, 1).value
+    time = datetime.datetime.fromtimestamp(table.cell(i, 8).value/1000)
+    text = table.cell(i, 11).value
+    new = Lab(uid,text,time)
+    db.session.add(new)
+
+db.session.commit()

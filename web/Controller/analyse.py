@@ -1,4 +1,4 @@
-from web.Model.database import My,Public
+from web.Model.database import My,Public,Lab
 import numpy as np
 import os
 import jieba
@@ -10,7 +10,7 @@ import re
 
 
 def anayse():
-    datas = Public.query.limit(400).all()
+    datas = Lab.query.all()
     arraylist = []
     for one in datas:
         arraylist.append(fenci(one.text))

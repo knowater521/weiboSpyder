@@ -1,0 +1,22 @@
+{% extends "bootstrap/base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "bootstrap/fixes.html" as fixes %}
+{% import "bootstrap/utils.html" as util %}
+
+
+{% block title %}
+Token设置
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 5em" xmlns="http://www.w3.org/1999/html">
+    <button href= {{ url_for("get_public_weibo") }}>   获取公关微博数据 </button><br><br>
+    <button href={{ url_for("get_my_weibo") }}> 获取个人微博数据 </button> <br><br>
+
+    <button href="{{ url_for("get_public_res") }}"> 分析公共微博数据 </button>
+    <button href="{{ url_for("get_public_res") }}"> 分析个人微博数据</button>
+
+</div>
+
+{% endblock %}
+
