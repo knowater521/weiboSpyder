@@ -29,7 +29,6 @@ class My(db.Model):
         self.text = text
         self.time = time
 
-
 class Lab(db.Model):
     __bind_key__ = 'weibo'
     uid = db.Column(db.Integer)
