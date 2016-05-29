@@ -9,12 +9,12 @@ import re
 
 
 def anayse():
-    datas = Lab.query.limit(1000).all()
+    datas = Lab.query.limit(10000).all()
     arraylist = []
     for one in datas:
         arraylist.append(fenci(one.text))
 
-    Tfidf(arraylist,datas)
+    tf_idf(arraylist, datas)
 
 r = re.compile(r'[\u4e00-\u9fa5]+')
 
@@ -36,7 +36,7 @@ def fenci(text):
     return " ".join(result)
 
 
-def Tfidf(arraylist,datas):
+def tf_idf(arraylist, datas):
     corpus = []
     for ff in arraylist:
         corpus.append(ff)
@@ -48,13 +48,8 @@ def Tfidf(arraylist,datas):
     word = vectorizer.get_feature_names()  # 所有文本的关键字
     weight = tfidf.toarray()  # 对应的tfidf矩阵
 
-    # sFilePath = '/Volumes/RamDisk/tfidffile'
-    # if not os.path.exists(sFilePath):
-    #     os.mkdir(sFilePath)
-
-
     column_sum_sort = weight[0].copy()
-    for i in range(1,len(weight)):
+    for i in range(1, len(weight)):
         column_sum_sort += weight[i]
     column_sum_sort = np.argsort(column_sum_sort)[::-1]
 
@@ -63,35 +58,20 @@ def Tfidf(arraylist,datas):
 
     lens = int(len(weight_tran))
 
-    for i in range(1,20):
-        weight_sort = np.row_stack((weight_sort,weight_tran[column_sum_sort[i]]))
+    for i in range(1, 300):
+        weight_sort = np.row_stack((weight_sort, weight_tran[column_sum_sort[i]]))
     weight_sort = weight_sort.transpose()
 
+    anasy2(weight_sort, word, datas)
 
 
-    # print(proweight)
-    # print(weight)
-    # print('----------')
-    # print(weight[0].sort())
-    anasy2(weight_sort,word,datas)
-    # for i in range(len(weight)):
-    #     f = open(sFilePath + '/' + str(i).zfill(5) + '.txt', 'w+')
-    #     res = []
-    #     for j in range(len(word)):
-    #         res.append((word[j], weight[i][j]))
-    #     res.sort(key=lambda x: x[1], reverse=True)
-    #     for o in range(5):
-    #         f.write(res[o][0] + '    '+str(res[o][1])+'\n')
-    #     f.close()
-
-
-def get_cos_vaule(x,y):
+def get_cos_vaule(x, y):
     Lx = np.sqrt(x.dot(x))
     Ly = np.sqrt(y.dot(y))
     return x.dot(y) / (Lx * Ly)
 
 
-def get_time_similarity(x,y):
+def get_time_similarity(x, y):
     t = (x-y).seconds
     if t > 259200:
         return 0
@@ -100,29 +80,29 @@ def get_time_similarity(x,y):
 
 
 def anasy2(vectors, words, datas):
-    cou = 0
-    topics = [{'vector':vectors[0],'wids':[datas[0].wid],'time':datas[0].time}]
+    count = 0
+    topics = [{'vector': vectors[0], 'wids':[datas[0].wid], 'time':datas[0].time}]
     for i in range(1, len(vectors)):
         match = False
         for j in range(len(topics)):
-            cou+=1
-            time_similarity = get_time_similarity(datas[i].time,topics[j]['time'])
+            count += 1
+            time_similarity = get_time_similarity(datas[i].time, topics[j]['time'])
             cos_value = get_cos_vaule(vectors[i], topics[j]['vector'])
             res = time_similarity*0.25 + cos_value*0.75
             if res > 0.6:
                 match = True
 
                 topics[j]['vector'] = (topics[j]['vector'] + vectors[i]) / 2
-                topics[j]['time'] = max(topics[j]['time'],datas[i].time)
+                topics[j]['time'] = max(topics[j]['time'], datas[i].time)
                 topics[j]['wids'].append(datas[i].wid)
         if not match:
-            topics.append({'vector': vectors[i],'wids':[datas[i].wid],'time':datas[i].time})
-    print(cou)
+            topics.append({'vector': vectors[i], 'wids': [datas[i].wid], 'time': datas[i].time})
+    print(count)
     print(len(topics))
 
     for one in topics:
-        if len(one['wids'])>1:
-            print(one['wids'],one['time'])
+        if len(one['wids']) > 5:
+            print(one['wids'], one['time'])
 
 if __name__ == '__main__':
     anayse()
