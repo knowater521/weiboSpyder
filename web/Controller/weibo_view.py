@@ -9,6 +9,7 @@ from ..Model.database import Public,db,My
 import re
 import jieba
 import datetime
+import web.Controller.analyse
 
 baseurl = ''
 
@@ -129,3 +130,16 @@ def get_weibo_by_name(weibo, name):
     return render_template('highfreq.html', dict=dict_sorted)
 
 
+@app.route('/manage')
+def manage_page():
+    return render_template('manage.html')
+
+
+@app.route('/public_result')
+def get_public_res():
+    pass
+
+
+@app.route('/my_result')
+def get_my_res():
+    pass
