@@ -1,8 +1,7 @@
-from web.Model.database import My,Public
+from web.Model.database import My,Public,Lab
 import numpy as np
 import os
 import jieba
-import datetime
 
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -10,7 +9,7 @@ import re
 
 
 def anayse():
-    datas = Public.query.limit(400).all()
+    datas = Lab.query.limit(1000).all()
     arraylist = []
     for one in datas:
         arraylist.append(fenci(one.text))
@@ -49,9 +48,9 @@ def Tfidf(arraylist,datas):
     word = vectorizer.get_feature_names()  # 所有文本的关键字
     weight = tfidf.toarray()  # 对应的tfidf矩阵
 
-    sFilePath = '/Volumes/RamDisk/tfidffile'
-    if not os.path.exists(sFilePath):
-        os.mkdir(sFilePath)
+    # sFilePath = '/Volumes/RamDisk/tfidffile'
+    # if not os.path.exists(sFilePath):
+    #     os.mkdir(sFilePath)
 
     # print(proweight)
     # print(weight)
@@ -76,30 +75,37 @@ def get_cos_vaule(x,y):
 
 
 def get_time_similarity(x,y):
-    return (1 - abs(x-y).seconds/86400) > 0
+    t = (x-y).seconds
+    if t > 259200:
+        return 0
+    else:
+        return 1 - t/259200
 
 
 def anasy2(vectors, words, datas):
     cou = 0
-    topics = [{'vector':vectors[0],'wids':[datas[0].wid]}]
+    topics = [{'vector':vectors[0],'wids':[datas[0].wid],'time':datas[0].time}]
     for i in range(1, len(vectors)):
         match = False
         for j in range(len(topics)):
             cou+=1
-            res = get_cos_vaule(vectors[i], topics[j]['vector'])
-            if res > 0.5:
+            time_similarity = get_time_similarity(datas[i].time,topics[j]['time'])
+            cos_value = get_cos_vaule(vectors[i], topics[j]['vector'])
+            res = time_similarity*0.25 + cos_value*0.75
+            if res > 0.6:
                 match = True
 
                 topics[j]['vector'] = (topics[j]['vector'] + vectors[i]) / 2
+                topics[j]['time'] = max(topics[j]['time'],datas[i].time)
                 topics[j]['wids'].append(datas[i].wid)
         if not match:
-            topics.append({'vector': vectors[i],'wids':[datas[i].wid]})
+            topics.append({'vector': vectors[i],'wids':[datas[i].wid],'time':datas[i].time})
     print(cou)
     print(len(topics))
 
     for one in topics:
         if len(one['wids'])>1:
-            print(one['wids'])
+            print(one['wids'],one['time'])
 
 if __name__ == '__main__':
     anayse()
